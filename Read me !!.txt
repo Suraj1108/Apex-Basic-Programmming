@@ -1,0 +1,7 @@
+With this file repository you will be able to write the apex code.
+
+This Repository is build to teach you to the Basic of Apex Programming to the 
+Advance Programmming.
+
+
+You will learn alot after getting into this .

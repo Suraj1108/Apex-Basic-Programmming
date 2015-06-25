@@ -1,0 +1,68 @@
+﻿This file will help you to getting started with Control Statements 
+
+Task : Given in the Below lines you have to write Comments after or within the Control Statements.
+
+	Conditional (If-Else) Statements:
+	Example:
+		Integer x, sign;
+		// Your code
+			if (x <= 0) {
+				if (x == 0) {
+					sign = 0;
+				} else {
+					sign = -1;
+				}
+			}
+	
+	Example:
+		if (place == 1) {
+			medal_color = 'gold';
+		} else if (place == 2) {
+			medal_color = 'silver';
+		} else if (place == 3) {
+			medal_color = 'bronze';
+		} else {
+			medal_color = null;
+		}
+		
+	Loops:
+		• do {statement} while (Boolean_condition);
+		• while (Boolean_condition) statement;
+		• for (initialization; Boolean_exit_condition; increment) statement;
+		• for (variable : array_or_set) statement;
+		• for (variable : [inline_soql_query]) statement;
+	
+	Looping Syntax:
+		
+		do {
+			code_block
+		} while (condition);
+
+
+		while (condition) {
+			code_block
+		}
+		
+		for (init_stmt; exit_condition; increment_stmt) {
+			code_block
+		}
+		
+		for (variable : list_or_set) {
+			code_block
+		}
+
+		for (variable : [soql_query]) {
+			code_block
+		}
+
+		for (variable_list : [soql_query]) {
+			code_block
+		}
+		
+	Examples:
+
+		1:	Integer[] myInts = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+			for (Integer i : myInts) {
+				System.debug(i);
+			}
+

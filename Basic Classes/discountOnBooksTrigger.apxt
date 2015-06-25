@@ -1,0 +1,9 @@
+/*	After Creating applyDiscountOnBooks class, you need to build an trigger(before insert) that will 
+ automatically update the book Price to its 80% of its origional value when you save it.
+*/
+trigger discountOnBooksTrigger on Book__c (before insert) {
+    
+    Book__c[] books= Trigger.New;
+        applyDiscountOnBooks.applyDiscount(books);
+
+}

@@ -1,0 +1,11 @@
+/*Before Creating this class,  You have to create a custom object BOOK__c with 
+  Price__c customfield of currency type.*/
+public class applyDiscountonBooks {
+    //Method to apply discount on Books Price
+    public static void applyDiscount(Book__c[] Books){
+        //This will reduce the price of books from 100% to 80%
+        for(Book__c b : books){
+            b.Price__c *= .8;
+        }	   
+    }        
+}

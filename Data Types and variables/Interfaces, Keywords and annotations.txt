@@ -1,0 +1,913 @@
+
+
+
+This file will allows you to get in touch with Interfaces,keywords and annotations.
+
+
+
+Understanding Interfaces:
+
+	An interface is like a class in which none of the methods have been implemented—the method signatures are there, but the body of
+	each method is empty. To use an interface, another class must implement it by providing a body for all of the methods contained in the
+	interface.
+
+	It can provide a layer of abstractions to your code. They seperates the specific implementationof a method from the declaration
+	for that method. This way you can have different implementations of a method based on your specific application.
+
+Example: 
+
+	a company might have two types of purchase orders, ones that come from customers, and others that come from their employees. Both are a
+	type of purchase order. Suppose you needed a method to provide a discount. The amount of the discount can depend on the type of purchase order.
+
+		// An interface that defines what a purchase order looks like in general
+		public interface PurchaseOrder {
+			// All other functionality excluded
+			Double discount();
+		}
+
+		// One implementation of the interface for customers
+		public class CustomerPurchaseOrder implements PurchaseOrder {
+			public Double discount() {
+			return .05; // Flat 5% discount
+			}
+		}
+
+		// Another implementation of the interface for employees
+		public class EmployeePurchaseOrder implements PurchaseOrder {
+			public Double discount() {
+			return .10; // It’s worth it being an employee! 10% discount
+			}
+		}
+
+	Note: You cannot add a method to a global interface after the class has been uploaded in a Managed - Released package version.
+
+
+Custom Iterators:
+
+	An iterator traverses through every item in a collection. For example, in a while loop in Apex, you define a condition for exiting the
+	loop, and you must provide some means of traversing the collection, that is, an iterator.
+
+Example:
+
+		while (count < 11) {
+			System.debug(count);
+			count++;
+		}
+	To use custom iterators, you must create an Apex class that implements the Iterator interface
+
+	The Iterator interface has the following instance methods:
+		hasnext();	//returns boolean
+		next();		//returns any type
+
+		IterableString x = new IterableString('This is a really cool test.');
+			
+			while(x.hasNext()){
+				system.debug(x.next());
+			}
+
+Using Custom Iterators with Iterable:
+
+	If you do not want to use a custom iterator with a list, but instead want to create your own data structure, you can use the Iterable
+	interface to generate the data structure.
+	
+	The iterator method must be declared as global or public. It creates a reference to the iterator that you can then use to traverse the
+ 	data structure.
+
+Example:
+	
+		global class CustomIterable
+			implements Iterator<Account>{
+				List<Account> accs {get; set;}
+				Integer i {get; set;}
+					public CustomIterable(){
+						accs = [SELECT Id, Name,
+							NumberOfEmployees
+							FROM Account
+							WHERE Name = 'false'];
+						i = 0;
+					}
+					global boolean hasNext(){
+						if(i >= accs.size()) {
+								return false;
+						} else {
+								return true;
+						}
+					}
+					global Account next(){
+						// 8 is an arbitrary constant in this example  that represents the maximum size of the list.
+						if(i == 8){return null;}
+							i++;
+						return accs[i-1];
+					}
+			}
+	
+	//The following call the above class
+		
+		global class foo implements iterable<Account>{
+			global Iterator<Account> Iterator(){
+				return new CustomIterable();
+			}
+		}
+
+	//Batch Job using an Iterator
+	
+	global class batchClass implements Database.batchable<Account>{
+		global Iterable<Account> start(Database.batchableContext info){
+			return new foo();
+		}
+
+		global void execute(Database.batchableContext info, List<Account> scope){
+			List<Account> accsToUpdate = new List<Account>();
+				for(Account a : scope){
+					a.Name = 'true';
+					a.NumberOfEmployees = 69;
+					accsToUpdate.add(a);
+				}
+			update accsToUpdate;
+		}
+
+		global void finish(Database.batchableContext info){
+		}
+	}
+
+
+Keywords:
+
+	• final
+	• instanceof
+	• super
+	• this
+	• transient
+	• with sharing and without sharing
+
+
+Using the final Keyword:
+
+	Final variables can only be assigned a value once, either when you declare a variable or in initialization code. You must assign a value
+	to it in one of these two places.
+	To define a constant, mark a variable as both static and final.
+	
+	Methods and classes are final by default. You cannot use the final keyword in the declaration of a class or method. This means
+	they cannot be overridden. Use the virtual keyword if you need to override a method or class.
+
+Using the instanceof Keyword:
+
+	If you need to verify at run time whether an object is actually an instance of a particular class, use the instanceof keyword.
+
+	Example:
+		You could add the following check to the Report class in the classes and casting example before you cast the item back into a
+		CustomReport object.
+
+		If (Reports.get(0) instanceof CustomReport) {
+			// Can safely cast it back to a custom report object
+			CustomReport c = (CustomReport) Reports.get(0);
+			} Else {
+				// Do something with the non-custom-report.
+		}
+
+Using the super Keyword:
+
+	The super keyword can be used by classes that are extended from virtual or abstract classes. By using super, you can override
+	constructors and methods from the parent class.
+
+	Example:
+		public virtual class SuperClass {
+
+			public String mySalutation;
+			public String myFirstName;
+			public String myLastName;
+		
+			public SuperClass() {
+				mySalutation = 'Mr.';
+				myFirstName = 'Carl';
+				myLastName = 'Vonderburg';
+			}
+
+			public SuperClass(String salutation, String firstName, String lastName) {
+
+				mySalutation = salutation;
+				myFirstName = firstName;
+				myLastName = lastName;
+			}
+
+			public virtual void printName() {
+				System.debug('My name is ' + mySalutation + myLastName);
+			}
+
+			public virtual String getFirstName() {
+				return myFirstName;
+			}
+
+		}
+
+
+	//create the following class that extends Superclass and overrides its printName method:
+
+		public class Subclass extends Superclass {
+			public override void printName() {
+				super.printName();
+				System.debug('But you can call me ' + super.getFirstName());
+			}
+		}
+
+	//use super to call constructors
+		public Subclass() {
+			super('Madam', 'Brenda', 'Clapentrap');
+		}
+
+	//the expected output of Subclass.printName is My name is Madam Clapentrap. But you can call me Brenda.
+
+	Note:
+		• Only classes that are extending from virtual or abstract classes can use super.
+		• You can only use super in methods that are designated with the override keyword.
+
+Using the this Keyword:
+
+	You can use the this keyword in dot notation, without parenthesis, to represent the current instance of the class in which it appears.
+	Use this form of the this keyword to access instance variables and methods.
+
+	Example:
+		public class myTestThis {
+			string s;
+			{
+				this.s = 'TestString';
+			}
+		}
+
+	you can use the this keyword to do constructor chaining, that is, in one constructor, call another constructor. In this format, use
+	the this keyword with parentheses.
+	
+	Example:
+		public class testThis {
+			// First constructor for the class. It requires a string parameter.
+			public testThis(string s2) {
+			}
+
+			// Second constructor for the class. It does not require a parameter.
+			// This constructor calls the first constructor using the this keyword.
+			public testThis() {
+				this('None');
+			}
+		}
+
+Using the transient Keyword :
+
+	Use the transient keyword to declare instance variables that can't be saved, and shouldn't be transmitted as part of the view state
+	for a Visualforce page.
+
+	Example:
+		Transient Integer currentTotal;
+
+	Declaring variables as transient reduces view state size. A common use case for the transient keyword is a field on a Visualforce
+	page that is needed only for the duration of a page request,
+	
+	Example:
+		The following example contains both a Visualforce page and a custom controller. Clicking the refresh button on the page causes the
+		transient date to be updated because it is being recreated each time the page is refreshed. The non-transient date continues to have
+		its original value, which has been deserialized from the view state, so it remains the same.
+
+		//visualforce Page
+		<apex:page controller="ExampleController">
+			T1: {!t1} <br/>
+			T2: {!t2} <br/>
+			<apex:form>
+				<apex:commandLink value="refresh"/>
+			</apex:form>
+		</apex:page>
+
+		//Page Controller
+		public class ExampleController {
+			
+			DateTime t1;
+			transient DateTime t2;
+				public String getT1() {
+					if (t1 == null) t1 = System.now();
+				return '' + t1;
+				}
+
+				public String getT2() {
+					if (t2 == null) t2 = System.now();
+				return '' + t2;
+
+				}
+		}
+
+
+Using the with sharing or without sharing Keywords:
+
+	Use the with sharing or without sharing keywords on a class to specify whether or not to enforce sharing rules.
+
+	The with sharing keyword allows you to specify that the sharing rules for the current user be taken into account for a class
+	
+	Example:
+		public with sharing class sharingClass {
+			// Code here
+		}
+
+	Use the without sharing keywords when declaring a class to ensure that the sharing rules for the current user are not enforced.
+	
+	Example:
+		public without sharing class noSharing {
+			// Code here
+		}
+
+	Notes:
+
+		• The sharing setting of the class where the method is defined is applied, not of the class where the method is called. For example, if
+		  a method is defined in a class declared with with sharing is called by a class declared with without sharing, the method
+		  will execute with sharing rules enforced.
+
+		• If a class isn’t declared as either with or without sharing, the current sharing rules remain in effect. This means that the class doesn’t
+		  enforce sharing rules except if it acquires sharing rules from another class. For example, if the class is called by another class that has
+		  sharing enforced, then sharing is enforced for the called class.
+
+		• Both inner classes and outer classes can be declared as with sharing. The sharing setting applies to all code contained in the
+		  class, including initialization code, constructors, and methods.
+
+		• Inner classes do not inherit the sharing setting from their container class.
+
+		• Classes inherit this setting from a parent class when one class extends or implements another.
+
+
+
+Annotations:
+
+	An Apex annotation modifies the way that a method or class is used, similar to annotations in Java.
+
+	Exammple:
+		global class MyClass {
+			@future
+			Public static void myMethod(String a)
+			{
+				//long-running Apex code
+			}
+		}
+
+	Apex have the following Annotations:
+
+	• @Deprecated
+	• @Future
+	• @InvocableMethod
+	• @InvocableVariable
+	• @IsTest
+	• @ReadOnly
+	• @RemoteAction
+	• @TestSetup
+	• @TestVisible
+	• Apex REST annotations:
+		– @RestResource(urlMapping='/yourUrl')
+		– @HttpDelete	
+		– @HttpGet
+		– @HttpPatch
+		– @HttpPost
+		– @HttpPut
+
+
+Deprecated Annotation:
+		Use the deprecated annotation to identify methods, classes, exceptions, enums, interfaces, or variables that can no longer be
+		referenced in subsequent releases of the managed package in which they reside.
+
+	Example:
+		@deprecated
+		// This method is deprecated. Use myOptimizedMethod(String a, String b) instead.
+			global void myMethod(String a) {
+		}
+
+	Notes:
+		• Unmanaged packages cannot contain code that uses the deprecated keyword.
+
+		• When an Apex item is deprecated, all global access modifiers that reference the deprecated identifier must also be deprecated.
+		  Any global method that uses the deprecated type in its signature, either in an input argument or the method return type, must also
+		  be deprecated. A deprecated item, such as a method or a class, can still be referenced internally by the package developer.
+
+		• webService methods and variables cannot be deprecated.
+
+		• You can deprecate an enum but you cannot deprecate individual enum values.
+
+		• You can deprecate an interface but you cannot deprecate individual methods in an interface.
+
+		• You can deprecate an abstract class but you cannot deprecate individual abstract methods in an abstract class.
+
+		• You cannot remove the deprecated annotation to undeprecate something in Apex after you have released a package version
+		  where that item in Apex is deprecated.
+
+
+Future Annotation:
+		Use the future annotation to identify methods that are executed asynchronously.
+
+		you can use the future annotation when making an asynchronous Web service callout to an external service. Without
+		the annotation, the Web service callout is made from the same thread that is executing the Apex code, and no additional processing
+		can occur until the callout is complete (synchronous processing).
+
+		Methods with the future annotation must be static methods, and can only return a void type.
+
+	Example:
+		global class MyFutureClass {
+		@future
+			static void myMethod(String a, Integer i) {
+				System.debug('Method called with: ' + a + ' and ' + i);
+				// Perform long-running code
+			}
+		}
+
+	Notes:
+		• Remember that any method using the future annotation requires special consideration because the method does not necessarily
+		  execute in the same order it is called.
+
+		• Methods with the future annotation cannot be used in Visualforce controllers in either getMethodName or setMethodName
+		  methods, nor in the constructor.
+
+		• You cannot call a method annotated with future from a method that also has the future annotation. Nor can you call a trigger
+	          from an annotated method that calls another annotated method.
+	
+		• The getContent and getContentAsPDF PageReference methods cannot be used in methods with the future
+		  annotation.
+
+InvocableMethod Annotation:
+
+		Invocable methods are called with the REST API and used to invoke a single Apex method. Invocable methods have dynamic input and
+		output values and support describe calls.
+
+	Example:
+		//invocable methods with primitive datatypes
+		public class AccountQueryAction {
+
+		@InvocableMethod(label='Get Account Names' description='Returns the list of account names
+				corresponding to the specified account IDs.')
+			
+			public static List<String> getAccountNames(List<ID> ids) {
+				List<String> accountNames = new List<String>();
+				List<Account> accounts = [SELECT Name FROM Account WHERE Id in :ids];
+				for (Account account : accounts) {
+				accountNames.add(account.Name);
+				}
+				return accountNames;
+			}
+		}
+
+		//invocable method with a specific sObjects Data types
+		public class AccountInsertAction {
+
+		@InvocableMethod(label='Insert Accounts' description='Inserts the accounts specified and
+				returns the IDs of the new accounts.')
+			
+			public static List<ID> insertAccounts(List<Account> accounts) {
+				Database.SaveResult[] results = Database.insert(accounts);
+				List<ID> accountIds = new List<ID>();
+					for (Database.SaveResult result : results) {
+						if (result.isSuccess()) {
+							accountIds.add(result.getId());
+						}
+					}
+				return accountIds;
+			}
+		}
+
+	Notes:
+		• Only one method in a class can have the InvocableMethod annotation.
+		
+		• Triggers can’t use invocable methods.
+
+		• The invocable method must be static and public or global, and its class must be an outer class.
+
+		• Other annotations can’t be used with the InvocableMethod annotation.
+
+		• There can be at most one input parameter and its data type must be one of the following:
+			– A list of a primitive data type or a list of lists of a primitive data type – the generic Object type is not supported.
+			– A list of an sObject type or a list of lists of an sObject type – the generic sObject type is not supported.
+			– A list of a user-defined type, containing variables of the supported types and with the InvocableVariable annotation.
+		
+		• If the return type is not Null, the data type returned by the method must be one of the following:
+			– A list of a primitive data type or a list of lists of a primitive data type – the generic Object type is not supported.
+			– A list of an sObject type or a list of lists of an sObject type – the generic sObject type is not supported.
+			– A list of a user-defined type, containing variables of the supported types and with the InvocableVariable annotation	
+		
+		• You can use invocable methods in packages, but once you add an invocable method you can’t remove it from later versions of the
+		  package.
+
+		• An invocable method can be public in a managed package,
+
+
+InvocableVariable Annotation:
+
+	The InvocableVariable annotation identifies a class variable used as an input or output parameter for an InvocableMethod
+	method’s invocable action. If you create your own custom class to use as the input or output to an invocable method, you can annotate
+	individual class member variables to make them available to the method.
+
+	Example:
+		global class ConvertLeadAction {
+			@InvocableMethod(label='Convert Leads')
+			global static List<ConvertLeadActionResult> convertLeads(List<ConvertLeadActionRequest> requests) {
+				List<ConvertLeadActionResult> results = new List<ConvertLeadActionResult>();
+					for (ConvertLeadActionRequest request : requests) {
+					results.add(convertLead(request));
+					}
+			return results;
+			}
+
+			public static ConvertLeadActionResult convertLead(ConvertLeadActionRequest request) {
+			
+				Database.LeadConvert lc = new Database.LeadConvert();
+					lc.setLeadId(request.leadId);
+					lc.setConvertedStatus(request.convertedStatus);
+				
+					if (request.accountId != null) {
+						lc.setAccountId(request.accountId);
+					}
+
+					if (request.contactId != null) {
+						lc.setContactId(request.contactId);
+					}
+
+					if (request.overWriteLeadSource != null && request.overWriteLeadSource) {
+						lc.setOverwriteLeadSource(request.overWriteLeadSource);
+					}
+	
+					if (request.createOpportunity != null && !request.createOpportunity) {
+						lc.setDoNotCreateOpportunity(!request.createOpportunity);
+					}
+					if (request.opportunityName != null) {
+						lc.setOpportunityName(request.opportunityName);
+					}
+					if (request.ownerId != null) {
+						lc.setOwnerId(request.ownerId);
+					}
+					if (request.sendEmailToOwner != null && request.sendEmailToOwner) {
+						lc.setSendNotificationEmail(request.sendEmailToOwner);
+					}
+				
+				Database.LeadConvertResult lcr = Database.convertLead(lc, true);
+					if (lcr.isSuccess()) {
+						ConvertLeadActionResult result = new ConvertLeadActionResult();
+						result.accountId = lcr.getAccountId();
+						result.contactId = lcr.getContactId();
+						result.opportunityId = lcr.getOpportunityId();
+					return result;
+					} else {
+						throw new ConvertLeadActionException(lcr.getErrors()[0].getMessage());
+						}
+			}
+		
+			global class ConvertLeadActionRequest {
+				@InvocableVariable(required=true)
+				public ID leadId;
+				@InvocableVariable(required=true)
+				public String convertedStatus;
+				@InvocableVariable
+				public ID accountId;
+				@InvocableVariable
+				public ID contactId;
+				@InvocableVariable
+				public Boolean overWriteLeadSource;
+				@InvocableVariable
+				public Boolean createOpportunity;
+				@InvocableVariable
+				public String opportunityName;
+				@InvocableVariable
+				public ID ownerId;
+				@InvocableVariable
+				public Boolean sendEmailToOwner;
+			}
+	
+			global class ConvertLeadActionResult {
+				@InvocableVariable
+				public ID accountId;
+				@InvocableVariable
+				public ID contactId;
+				@InvocableVariable
+				public ID opportunityId;
+			}
+			
+			class ConvertLeadActionException extends Exception {}
+		}
+		
+
+InvocableVariable Modifiers				:
+
+		The invocable variable annotation has three available modifiers, as shown in this example.
+			
+		@InvocableVariable(label='yourLabel' description='yourDescription' required=(true | false))
+
+		All modifiers are optional.
+
+	Notes:
+		• Other annotations can’t be used with the InvocableVariable annotation.
+
+		• Only global and public variables can be invocable variables.
+
+		• The invocable variable can’t be one of the following:
+			– A type such as an interface, class, or enum.
+			– A non-member variable such as a static or local variable.
+			– A property.
+			– A final variable.
+			– Protected or private.
+
+		• The data type of the invocable variable must be one of the following:
+			– A primitive data type or a list of a primitive data type – the generic Object type is not supported.
+			– An sObject type or a list of an sObject type – the generic sObject type is not supported.
+
+IsTest Annotation:
+	
+	Use the isTest annotation to define classes and methods that only contain code used for testing your application. The isTest
+	annotation on methods is equivalent to the testMethod keyword.
+
+	Classes and methods defined as isTest can be either private or public. Classes defined as isTest must be top-level classes.
+
+	Example:
+		//private test class that contains two test methods.
+		@isTest
+		private class MyTestClass {
+			// Methods for testing
+			@isTest static void test1() {
+				// Implement test code
+			}
+	
+			@isTest static void test2() {
+				// Implement test code
+			}
+		}
+
+		//public test class that contains utility methods for test data creation.
+		@isTest
+		public class TestUtil {
+			public static void createTestAccounts() {
+				// Create some test accounts
+			}
+			public static void createTestContacts() {
+				// Create some test contacts
+			}
+		}
+
+
+IsTest(SeeAllData=true) Annotation:
+
+	use the isTest(SeeAllData=true) annotation to grant test classes and individual test methods access to all data in the organization, 
+	including pre-existing data that the test didn’t create.
+
+	Notes:
+		•If a test class is defined with the isTest(SeeAllData=true) annotation, this annotation applies to all its test methods
+		  whether the test methods are defined with the @isTest annotation or the testmethod keyword.
+
+		• The isTest(SeeAllData=true) annotation is used to open up data access when applied at the class or method level.
+		  However, using isTest(SeeAllData=false) on a method doesn’t restrict organization data access for that method
+		  if the containing class has already been defined with the isTest(SeeAllData=true) annotation.
+
+	Example:
+		//All the test methods in this class have access to all data in the organization.
+		// All test methods in this class can access all data.
+		@isTest(SeeAllData=true)
+		public class TestDataAccessClass {
+		// This test accesses an existing account.
+		// It also creates and accesses a new test account.
+
+			static testmethod void myTestMethod1() {
+				// Query an existing account in the organization.
+				Account a = [SELECT Id, Name FROM Account WHERE Name='Acme' LIMIT 1];
+				System.assert(a != null);
+
+				// Create a test account based on the queried account.
+				Account testAccount = a.clone();
+				testAccount.Name = 'Acme Test';
+				insert testAccount;
+
+				// Query the test account that was inserted.
+				Account testAccount2 = [SELECT Id, Name FROM Account
+							WHERE Name='Acme Test' LIMIT 1];
+				System.assert(testAccount2 != null);
+			}
+
+		// Like the previous method, this test method can also access all data
+		// because the containing class is annotated with @isTest(SeeAllData=true).
+			@isTest static void myTestMethod2() {
+				// Can access all data in the organization.
+			}
+		}
+
+	Example:
+		This second example shows how to apply the isTest(SeeAllData=true) annotation on a test method. Because the class that
+		the test method is contained in isn’t defined with this annotation, you have to apply this annotation on the test method to enable access
+		to all data for that test method.
+
+		// This class contains test methods with different data access levels.
+		@isTest
+		private class ClassWithDifferentDataAccess {
+			// Test method that has access to all data.
+			@isTest(SeeAllData=true)
+			static void testWithAllDataAccess() {
+				// Can query all data in the organization.
+			}
+
+			// Test method that has access to only the data it creates and organization setup and metadata objects.
+
+			@isTest static void testWithOwnDataAccess() {
+			// This method can still access the User object.
+			// This query returns the first user object.
+				User u = [SELECT UserName,Email FROM User LIMIT 1];
+				System.debug('UserName: ' + u.UserName);
+				System.debug('Email: ' + u.Email);
+
+			// Can access the test account that is created here.
+			Account a = new Account(Name='Test Account');
+			insert a;
+
+			// Access the account that was just created.
+			Account insertedAcct = [SELECT Id,Name FROM Account
+						WHERE Name='Test Account'];
+				System.assert(insertedAcct != null);
+			}			
+		}
+
+
+IsTest(OnInstall=true) Annotation:
+
+	Use the IsTest(OnInstall=true) annotation to specify which Apex tests are executed during package installation. This annotation is used for tests
+	in managed or unmanaged packages. Only test methods with this annotation, or methods that are part of a test class that has this annotation, will 
+	be executed during package installation.
+
+	Example:
+		This example shows how to annotate a test method that will be executed during package installation. In this example, test1 will be
+		executed but test2 and test3 won't.
+
+		public class OnInstallClass {
+			// Implement logic for the class.
+			public void method1(){
+			// Some code
+			}
+		}
+
+		@isTest
+		private class OnInstallClassTest {
+			// This test method will be executed
+			// during the installation of the package.
+			@isTest(OnInstall=true)
+			static void test1() {
+			// Some test code
+			}
+
+			// Tests excluded from running during the
+			// the installation of a package.
+			@isTest
+			static void test2() {
+				// Some test code
+			}
+			static testmethod void test3() {
+				// Some test code
+			}
+		}
+
+
+ReadOnly Annotation:
+	
+	The @ReadOnly annotation allows you to perform unrestricted queries against the Force.com database. All other limits still apply.
+	The @ReadOnly annotation is available for Web services and the Schedulable interface. To use the @ReadOnly annotation,
+	the top level request must be in the schedule execution or the Web service invocation. For example, if a Visualforce page calls a Web
+	service that contains the @ReadOnly annotation, the request fails because Visualforce is the top level request, not the Web service.
+
+RemoteAction Annotation:
+
+	The RemoteAction annotation provides support for Apex methods used in Visualforce to be called via JavaScript. This process is
+	often referred to as JavaScript remoting.
+	Methods with the RemoteAction annotation must be static and either global or public.
+
+		JavaScript remoting in a Visualforce page, add the request as a JavaScript invocation with the following form:
+		
+		[namespace.]controller.method(
+			[parameters...,]
+			callbackFunction,
+			[configuration]
+		);
+
+		@RemoteAction
+		global static String getItemId(String objectName) { ... }
+
+TestSetup Annotation:
+
+	Methods defined with the @testSetup annotation are used for creating common test records that are available for all test methods
+	in the class.
+
+	Syntax:
+		@testSetup static void methodName() {
+		}
+
+	Notes:
+		If a test class contains a test setup method, the testing framework executes the test setup method first, before any test method in the
+		class. Records that are created in a test setup method are available to all test methods in the test class and are rolled back at the end of
+		test class execution. If a test method changes those records, such as record field updates or record deletions, those changes are rolled
+		back after each test method finishes execution. The next executing test method gets access to the original unmodified state of those
+		records.
+
+
+TestVisible Annotation:
+	
+	Use the TestVisible annotation to allow test methods to access private or protected members of another class outside the test
+	class. These members include methods, member variables, and inner classes.
+
+	Example:
+		//how to annotate a private class member variable and private method with TestVisible
+		public class TestVisibleExample {
+			
+			// Private member variable
+			@TestVisible private static Integer recordNumber = 1;
+			// Private method
+			@TestVisible private static void updateRecord(String name) {
+				// Do something
+			}
+		}
+
+		//the test class that uses the previous class
+		@isTest
+		private class TestVisibleExampleTest {
+			
+			@isTest static void test1() {
+			// Access private variable annotated with TestVisible
+			Integer i = TestVisibleExample.recordNumber;
+			System.assertEquals(1, i);
+
+			// Access private method annotated with TestVisible
+			TestVisibleExample.updateRecord('RecordName');
+				// Perform some verification
+			}
+		}
+
+Apex REST Annotations:
+
+	Six new annotations have been added that enable you to expose an Apex class as a RESTful Web service.
+		• @RestResource(urlMapping='/yourUrl')
+		• @HttpDelete
+		• @HttpGet
+		• @HttpPatch
+		• @HttpPost
+		• @HttpPut
+
+RestResource Annotation:
+
+	The @RestResource annotation is used at the class level and enables you to expose an Apex class as a REST resource
+
+	Notes:
+		• The URL mapping is relative to https://instance.salesforce.com/services/apexrest/.
+		
+		• A wildcard character (*) may be used.
+
+		• The URL mapping is case-sensitive. A URL mapping for my_url will only match a REST resource containing my_url and not My_Url.
+
+		• To use this annotation, your Apex class must be defined as global.
+
+
+HttpDelete Annotation:
+
+	The @HttpDelete annotation is used at the method level and enables you to expose an Apex method as a REST resource. This
+	method is called when an HTTP DELETE request is sent, and deletes the specified resource.
+
+	To use this annotation, your Apex method must be defined as global static.
+
+
+HttpGet Annotation:
+
+	The @HttpGet annotation is used at the method level and enables you to expose an Apex method as a REST resource. This method
+	is called when an HTTP GET request is sent, and returns the specified resource.
+
+	Notes:
+		• To use this annotation, your Apex method must be defined as global static.
+
+		• Methods annotated with @HttpGet are also called if the HTTP request uses the HEAD request method.
+
+HttpPatch Annotation:
+
+	The @HttpPatch annotation is used at the method level and enables you to expose an Apex method as a REST resource. This method
+	is called when an HTTP PATCH request is sent, and updates the specified resource.
+
+	To use this annotation, your Apex method must be defined as global static.
+
+HttpPost Annotation:
+
+	The @HttpPost annotation is used at the method level and enables you to expose an Apex method as a REST resource. This method
+	is called when an HTTP POST request is sent, and creates a new resource.
+
+	To use this annotation, your Apex method must be defined as global static.
+
+HttpPut Annotation:
+
+	The @HttpPut annotation is used at the method level and enables you to expose an Apex method as a REST resource. This method
+	is called when an HTTP PUT request is sent, and creates or updates the specified resource.
+
+	To use this annotation, your Apex method must be defined as global static.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

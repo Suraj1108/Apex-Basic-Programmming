@@ -1,0 +1,256 @@
+If you are a Java Developer, yo can easily understand the below written Information Useful 
+
+Task : You need to add comment after each line after understanding by yourself. For some I have already written the Comments. 
+
+Primitive Data Types :
+	Blog
+	Boolean
+	Date
+	Datetime
+	Decimal
+	Double
+	Id
+	Integer 
+	Long
+	Object
+	String 
+	Time
+	
+Collection
+	List	
+			List<String> List_1 = new List<String>();							//Simple List Syntax
+			List<List<set<String>>> List_2 = new List<List<set<String>>>();		//Nested list
+			List_1.add('Suraj');												//will add 'suraj' to list
+			String name = List_1.get(0);										//will assign 0th element to new
+			List_1.set(1,'Nipun');												//will set 'nipun' to 1st element of list
+			List_1.clear();														//will clear the whole list
+			
+			String[] books = new List<String>();
+			List<String> books = new String[1];
+			String[] books = new String[1];
+			
+			String[0] = 'Lord of the Rings';
+			
+			List<String> colors = new List<String>{
+				'red',
+				'green',
+				'blue',
+				'yellow'};
+			colors.sort();
+			System.assertEquals('blue', colors.get(0));
+			System.assertEquals('green', colors.get(1));
+			
+			List<SelectOption> options = new List<SelectOption>();
+			options.add(new SelectOption('A', 'Calcutta'));
+			options.add(new SelectOption('B', 'Mumbai'));
+			options.add(new SelectOption('A', 'Delhi'));
+			System.debug('Options before sorting' + options);
+			Options.sort();
+			System.debug('Options after sorting' + options);
+					
+	Set 	
+			Set<Integer> numberSet = new Set<Integer>();
+			numberSet.add(1);
+			numberSet.add(4);
+			numberSet.add(5+6);
+			
+			Set<Integer> numberSet_new = new Set<Integer>(numberSet);
+			
+			numberSet_new.add(10);
+			numberSet_new.remove(1);
+			
+	Map
+			Map<String,  String> ID_Employees =new Map<String,  String>();
+			Map<Id, set<String>> map = new Map<Id,  set<String>>();
+			Map<Integer, String> m = new Map<Integer, String>{1 => 'suraj',  2 => 'nipun', 3 => 'Ankit'..toUppercase()};
+			m.put(4, 'Barati');
+			System.assert(m.containsKey(1));
+			String value= m.get(1);
+			System.assertEquals('suraj', value );
+			Set<Integer> s = m.keySet();
+			
+	Subtyping with Parameterized List
+		
+			List<String> slst = new List<String>{'foo', 'bar'};
+			List<Object> olst = slst;
+	
+	Enums
+			public enum Season {SUMMER, WINTER, SPRING, FALL}
+			Season e = Season.WINTER;
+				Season m (Integer x, Season e){
+					if(e == Season.SUMMER) return e;
+				}
+	
+	Inbuild System Defined Enums
+
+			System.StatusCode
+			StatusCode.CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY
+			StatusCode.INSUFFICIENT_ACCESS_ON_CROSS_REFERENCE_ENTITY
+			
+			System.XmlTag:
+			System.ApplicationReadWriteMode:
+			System.LoggingLevel:
+			System.RoundingMode:
+			System.SoapType:
+			System.DisplayType:
+			System.JSONToken:
+			ApexPages.Severity:
+			Dom.XmlNodeType:
+	
+	Variables
+		
+			Integer i = 0;
+			String str;
+			List<String> strList;
+			Set<String> s;
+			Map<String, String> map;
+	
+	Null variable and Initial variable
+		
+			Boolean i = null;
+			Decimal d ;
+			Date d ;
+			d.adddays(2);  // returns NullPointerException
+			
+	Note 
+		 All you write in Apex,  SOQL, SOSL etc. are case insensitive .
+			Example:
+					Account a1;
+					ACCOUNT a2;
+					Account[] accts = [sELect ID From ACCouNT where nAme = 'fred'];
+					
+	Constants
+			
+			Public Class myClass(){
+				static final Integer PRIVATE_INT_CONST = 200;
+				static final  Integer PRIVATE_INT_CONST_1;
+				
+				public static Integer calculate(Integer a, Integer b){
+					return a+b;
+				}
+				
+				static{
+					PRIVATE_INT_CONST_1 = calculate(2 , 8);
+				}
+			}
+			
+	Understanding Expressions
+			An expression is a construct made up of variables, operators, and method invocations that evaluates to a single value
+			
+			Literal Expressions
+					1 + 1
+			
+			A new sObject, Apex  object, List, set, Map
+					new Account(<field_initializers>)
+					new Integer[<n>]
+					new Account[]{<elements>}
+					new List<Account>()
+					new Set<String>{}
+					new Map<String, Integer>()
+					new myRenamingClass(string oldName, string newName)
+					
+			L-Values
+					Integer i
+					myList[3]
+					myContact.name
+					myRenamingClass.oldName
+					
+			form SOQL and SOSL
+					Account[] aa = [SELECT Id, Name FROM Account WHERE Name ='Acme'];
+					Integer i = [SELECT COUNT() FROM Contact WHERE LastName ='Weissman'];
+					List<List<SObject>> searchList = [FIND 'map*' IN ALL FIELDS RETURNING Account (Id, Name),
+					Contact, Opportunity, Lead];
+			
+			Static or instace method invocation
+					System.assert(true)
+					myRenamingClass.replaceNames()
+					changePoint(new Point(x, y));
+	
+	Understanding Expression Operators
+			Operators:
+						=
+						+=
+						*=
+						/=
+						-=
+						|=		//OR assignment operator
+						&= 		//AND assignment operator
+						<<=		//Bitwise shift left assignment operator.
+						>>=		//Bitwise shift right  signed assignment operator.
+						>>>=	//Bitwise shift right unsigned assignment operator.
+						? : 	// Ternary Operators
+						&&		// Logical AND
+						||		// Logical OR
+						==		//Equality Operator
+						===		//Exact Equality Operator
+						<
+						>
+						>=
+						<=
+						!=
+						!==
+						+
+						-
+						*
+						/
+						!		//logical Complement operator
+						-		//unary Negative Operator
+						++
+						--
+						&
+						|
+						^		//Bitwise exclusive OR operator.
+						^=		//Bitwise exclusive OR operator. with assigning the result
+						<<
+						>>		//Bitwise shift right signed operator.
+						>>>		
+	
+	Assignment Statements
+					
+			[LValue] = [new_value_expression];
+			[LValue] = [[inline_soql_query]];
+			Integer i = 1;
+			Account a = new Account();
+			Account[] accts = [SELECT Id FROM Account];
+			ints[0] = 1;
+			accts[0].Name = 'Acme';
+			
+			Example 1:
+					Account a = new Account(Name = 'Acme', BillingCity = 'San Francisco');
+					// IDs cannot be set prior to an insert call
+					// a.Id = '00300000003T2PGAA0';
+					// Instead, insert the record. The system automatically assigns it an ID.
+					insert a;
+					
+					// Fields also must be writeable for the context user
+					// a.CreatedDate = System.today(); This code is invalid because
+					// createdDate is read-only!
+					// Since the account a has been inserted, it is now possible to
+					// create a new contact that is related to it
+					
+					Contact c = new Contact(LastName = 'Roth', Account = a);
+					// Notice that you can write to the account name directly through the contact
+					c.Account.Name = 'salesforce.com';
+					
+			Example 2 : Assignment is always done by reference.
+					Account a = new Account();
+					Account b;
+					Account[] c = new Account[]{};
+					a.Name = 'Acme';
+					b = a;
+					c.add(a);
+					// These asserts should now be true. You can reference the data
+					// originally allocated to account a through account b and account list c.
+					System.assertEquals(b.Name, 'Acme');
+					System.assertEquals(c[0].Name, 'Acme');
+					
+			Example 3:
+					Account[] a = new Account[]{new Account()};
+					Account[] b = a;
+					a[0].Name = 'Acme';
+					System.assert(b[0].Name == 'Acme');
+
+	Understanding Rules of Conversion
+				Long MillsPerYear = 365L * 24L * 60L * 60L * 1000L;
+				Long ExpectedValue = 31536000000L;
+				System.assertEquals(MillsPerYear, ExpectedValue);

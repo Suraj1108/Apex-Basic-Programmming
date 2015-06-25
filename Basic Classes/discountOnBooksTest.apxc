@@ -1,0 +1,27 @@
+/*	After creating the Class and the Triggers, The most important part of the Programming is left that is 
+ creating a Test Class, you need to ensure that atleast 75% of your code is covered by these test. 
+*/
+/*	After creating this test class, you need to click on the Test on developer console, select the test and run 
+	Result will be displayed on test Tab on the lower panel of Developer console.
+*/
+
+@isTest
+private class discountOnBooksTest {
+    static testMethod void validateDiscountOnBooks(){
+       
+        Book__c book = new Book__c(Name = 'Force.com on Cloud', Price__c = 100.00 );
+        System.debug('Price before inserting new book:' + book.Price__c);
+        
+        //Insert Book 
+       	insert book;
+        
+        //Retrive the New Book
+        book = [SELECT NAME, PRICE__C FROM BOOK__C WHERE Id= :book.Id ];
+        System.debug('Price after trigger fired: ' + book.Price__c);
+        
+        // Test that the trigger correctly updated the price
+		System.assertEquals(800, book.Price__c);
+        
+    } 
+}
+
